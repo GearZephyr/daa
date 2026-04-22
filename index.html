@@ -244,22 +244,22 @@ void lcsLength(string x, string y, int m, int n) {
                 b[i][j] = 'L';
             }
         }
+    }
 
-        cout << "\\nB Table:\\n";
-        for(int x1 = 1; x1 <= m; x1++) {
-            for(int y1 = 1; y1 <= n; y1++) {
-                cout << b[x1][y1] << "\\t";
-            }
-            cout << endl;
+    cout << "\\nB Table:\\n";
+    for(int x1 = 1; x1 <= m; x1++) {
+        for(int y1 = 1; y1 <= n; y1++) {
+            cout << b[x1][y1] << "\\t";
         }
+        cout << endl;
+    }
 
-        cout << "\\nC Table:\\n";
-        for(int x1 = 0; x1 <= m; x1++) {
-            for(int y1 = 0; y1 <= n; y1++) {
-                cout << c[x1][y1] << "\\t";
-            }
-            cout << endl;
+    cout << "\\nC Table:\\n";
+    for(int x1 = 0; x1 <= m; x1++) {
+        for(int y1 = 0; y1 <= n; y1++) {
+            cout << c[x1][y1] << "\\t";
         }
+        cout << endl;
     }
 
     cout << "\\nLength of LCS: " << c[m][n] << endl;
@@ -347,8 +347,7 @@ int main() {
     string T, P;
 
     cout << "Enter text: ";
-    cin.ignore();
-    getline(cin, T);
+    getline(cin >> ws, T);
 
     cout << "Enter pattern: ";
     getline(cin, P);
