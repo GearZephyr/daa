@@ -16,9 +16,14 @@
             border: none;
             cursor: pointer;
             font-weight: bold;
+            border-radius: 5px;
         }
         button:hover {
             background: #00ccaa;
+        }
+        #status {
+            margin-top: 20px;
+            color: #00ffcc;
         }
     </style>
 </head>
@@ -26,11 +31,13 @@
 
 <h2>Click to Copy Code</h2>
 
-<button onclick="copyCode('floyd')">Copy Floyd Warshall</button>
-<button onclick="copyCode('mcm')">Copy MCM</button>
-<button onclick="copyCode('lcs')">Copy LCS</button>
-<button onclick="copyCode('kmp')">Copy KMP</button>
-<button onclick="copyCode('rk')">Copy Rabin-Karp</button>
+<button onclick="copyCode('floyd')">Floyd Warshall</button>
+<button onclick="copyCode('mcm')">MCM</button>
+<button onclick="copyCode('lcs')">LCS</button>
+<button onclick="copyCode('kmp')">KMP</button>
+<button onclick="copyCode('rk')">Rabin-Karp</button>
+
+<p id="status"></p>
 
 <script>
 const codes = {
@@ -175,8 +182,28 @@ void search(string txt,string pat,int q){
 };
 
 function copyCode(type) {
-    navigator.clipboard.writeText(codes[type]);
-    alert(type.toUpperCase() + " code copied!");
+    const text = codes[type];
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text)
+        .then(() => {
+            document.getElementById("status").innerText = type.toUpperCase() + " copied!";
+        })
+        .catch(() => fallbackCopy(text, type));
+    } else {
+        fallbackCopy(text, type);
+    }
+}
+
+function fallbackCopy(text, type) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+
+    document.getElementById("status").innerText = type.toUpperCase() + " copied!";
 }
 </script>
 
