@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Code Copy Tool</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #111;
+            color: #fff;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            background: #00ffcc;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #00ccaa;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Click to Copy Code</h2>
+
+<button onclick="copyCode('floyd')">Copy Floyd Warshall</button>
+<button onclick="copyCode('mcm')">Copy MCM</button>
+<button onclick="copyCode('lcs')">Copy LCS</button>
+<button onclick="copyCode('kmp')">Copy KMP</button>
+<button onclick="copyCode('rk')">Copy Rabin-Karp</button>
+
+<script>
+const codes = {
+
+floyd: `// Floyd Warshall
+#include<iostream>
+using namespace std;
+int main(){
+  int n;
+  cin>>n;
+  int D[n][n];
+  for(int i=0;i<n;i++){
+    for(int j=0;j<n;j++){
+      cin>>D[i][j];
+    }
+  }
+  for(int k=0;k<n;k++){
+    for(int i=0;i<n;i++){
+      for(int j=0;j<n;j++){
+        if(D[i][j]>D[i][k]+D[k][j]){
+          D[i][j]=D[i][k]+D[k][j];
+        }
+      }
+    }
+  }
+}`,
+
+mcm: `// Matrix Chain Multiplication
+#include<iostream>
+using namespace std;
+
+int m[20][20], s[20][20];
+
+void mcm(int P[], int n){
+    for(int i=1;i<n;i++)
+        m[i][i]=0;
+
+    for(int l=2;l<n;l++){
+        for(int i=1;i<n-l+1;i++){
+            int j=i+l-1;
+            m[i][j]=999999;
+            for(int k=i;k<j;k++){
+                int q=m[i][k]+m[k+1][j]+P[i-1]*P[k]*P[j];
+                if(q<m[i][j]){
+                    m[i][j]=q;
+                    s[i][j]=k;
+                }
+            }
+        }
+    }
+}`,
+
+lcs: `// LCS
+#include<iostream>
+using namespace std;
+
+int c[30][30];
+char b[30][30];
+
+void lcs(string x,string y){
+    int m=x.length(), n=y.length();
+
+    for(int i=0;i<=m;i++) c[i][0]=0;
+    for(int j=0;j<=n;j++) c[0][j]=0;
+
+    for(int i=1;i<=m;i++){
+        for(int j=1;j<=n;j++){
+            if(x[i-1]==y[j-1]){
+                c[i][j]=c[i-1][j-1]+1;
+                b[i][j]='D';
+            } else if(c[i-1][j]>=c[i][j-1]){
+                c[i][j]=c[i-1][j];
+                b[i][j]='U';
+            } else {
+                c[i][j]=c[i][j-1];
+                b[i][j]='L';
+            }
+        }
+    }
+}`,
+
+kmp: `// KMP
+#include<iostream>
+using namespace std;
+
+void kmp(string T,string P){
+    int n=T.length(), m=P.length();
+    int pi[m+1];
+    pi[1]=0;
+    int k=0;
+
+    for(int q=2;q<=m;q++){
+        while(k>0 && P[k]!=P[q-1])
+            k=pi[k];
+        if(P[k]==P[q-1])
+            k++;
+        pi[q]=k;
+    }
+
+    int q=0;
+    for(int i=1;i<=n;i++){
+        while(q>0 && P[q]!=T[i-1])
+            q=pi[q];
+        if(P[q]==T[i-1])
+            q++;
+        if(q==m){
+            cout<<"Found at "<<i-m<<endl;
+            q=pi[q];
+        }
+    }
+}`,
+
+rk: `// Rabin Karp
+#include<iostream>
+using namespace std;
+
+#define d 256
+
+void search(string txt,string pat,int q){
+    int m=pat.length(), n=txt.length();
+    int p=0,t=0,h=1;
+
+    for(int i=0;i<m-1;i++)
+        h=(h*d)%q;
+
+    for(int i=0;i<m;i++){
+        p=(d*p+pat[i])%q;
+        t=(d*t+txt[i])%q;
+    }
+
+    for(int i=0;i<=n-m;i++){
+        if(p==t){
+            if(txt.substr(i,m)==pat)
+                cout<<"Found at "<<i<<endl;
+        }
+        if(i<n-m){
+            t=(d*(t-txt[i]*h)+txt[i+m])%q;
+            if(t<0) t+=q;
+        }
+    }
+}`
+};
+
+function copyCode(type) {
+    navigator.clipboard.writeText(codes[type]);
+    alert(type.toUpperCase() + " code copied!");
+}
+</script>
+
+</body>
+</html>
