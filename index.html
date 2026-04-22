@@ -4,7 +4,7 @@
     <title>Code Copy Tool</title>
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             background: #111;
             color: #fff;
             padding: 20px;
@@ -42,149 +42,386 @@
 <script>
 const codes = {
 
-floyd: `// Floyd Warshall
-#include<iostream>
+floyd: `#include <iostream>
 using namespace std;
-int main(){
-  int n;
-  cin>>n;
-  int D[n][n];
-  for(int i=0;i<n;i++){
-    for(int j=0;j<n;j++){
-      cin>>D[i][j];
-    }
-  }
-  for(int k=0;k<n;k++){
-    for(int i=0;i<n;i++){
-      for(int j=0;j<n;j++){
-        if(D[i][j]>D[i][k]+D[k][j]){
-          D[i][j]=D[i][k]+D[k][j];
+
+#define INF 999
+
+int main() {
+    int n;
+    int D[50][50], P[50][50];
+
+    cout << "Enter number of vertices: ";
+    cin >> n;
+
+    cout << "Enter distance matrix:" << endl;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            cin >> D[i][j];
         }
-      }
     }
-  }
+
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            if(i == j || D[i][j] == INF)
+                P[i][j] = -1;
+            else
+                P[i][j] = i;
+        }
+    }
+
+    cout << "\\nInitial Distance Matrix:\\n";
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            cout << D[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << "\\nInitial Path Matrix:\\n";
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            cout << P[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    for(int k = 0; k < n; k++) {
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                if(D[i][k] != INF && D[k][j] != INF && D[i][j] > D[i][k] + D[k][j]) {
+                    D[i][j] = D[i][k] + D[k][j];
+                    P[i][j] = k;
+                }
+            }
+        }
+
+        cout << "\\nDistance Matrix after k = " << k + 1 << ":\\n";
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                cout << D[i][j] << " ";
+            }
+            cout << endl;
+        }
+
+        cout << "\\nPath Matrix after k = " << k + 1 << ":\\n";
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                cout << P[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    cout << "\\nFinal Shortest Distance Matrix:\\n";
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            cout << D[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
 }`,
 
-mcm: `// Matrix Chain Multiplication
-#include<iostream>
+mcm: `#include <iostream>
 using namespace std;
 
 int m[20][20], s[20][20];
 
-void mcm(int P[], int n){
-    for(int i=1;i<n;i++)
-        m[i][i]=0;
+void printOptimalParenthesis(int i, int j) {
+    if(i == j) {
+        cout << "A" << i;
+    } else {
+        cout << "(";
+        printOptimalParenthesis(i, s[i][j]);
+        printOptimalParenthesis(s[i][j] + 1, j);
+        cout << ")";
+    }
+}
 
-    for(int l=2;l<n;l++){
-        for(int i=1;i<n-l+1;i++){
-            int j=i+l-1;
-            m[i][j]=999999;
-            for(int k=i;k<j;k++){
-                int q=m[i][k]+m[k+1][j]+P[i-1]*P[k]*P[j];
-                if(q<m[i][j]){
-                    m[i][j]=q;
-                    s[i][j]=k;
+void matrixChainMultiplication(int p[], int n) {
+    for(int i = 1; i <= n; i++) {
+        m[i][i] = 0;
+    }
+
+    for(int l = 2; l <= n; l++) {
+        for(int i = 1; i <= n - l + 1; i++) {
+            int j = i + l - 1;
+            m[i][j] = 999999;
+
+            for(int k = i; k < j; k++) {
+                int q = m[i][k] + m[k + 1][j] + p[i - 1] * p[k] * p[j];
+                if(q < m[i][j]) {
+                    m[i][j] = q;
+                    s[i][j] = k;
                 }
             }
         }
+
+        cout << "\\nM Matrix:\\n";
+        for(int x = 1; x <= n; x++) {
+            for(int y = 1; y <= n; y++) {
+                cout << m[x][y] << "\\t";
+            }
+            cout << endl;
+        }
+
+        cout << "\\nS Matrix:\\n";
+        for(int x = 1; x <= n; x++) {
+            for(int y = 1; y <= n; y++) {
+                cout << s[x][y] << "\\t";
+            }
+            cout << endl;
+        }
     }
+
+    cout << "\\nOptimal Parenthesization: ";
+    printOptimalParenthesis(1, n);
+
+    cout << "\\nMinimum Multiplications: " << m[1][n] << endl;
+}
+
+int main() {
+    int n;
+    int p[20];
+
+    cout << "Enter number of matrices: ";
+    cin >> n;
+
+    cout << "Enter dimensions array of size " << n + 1 << ": ";
+    for(int i = 0; i <= n; i++) {
+        cin >> p[i];
+    }
+
+    matrixChainMultiplication(p, n);
+
+    return 0;
 }`,
 
-lcs: `// LCS
-#include<iostream>
+lcs: `#include <iostream>
+#include <string>
 using namespace std;
 
-int c[30][30];
 char b[30][30];
+int c[30][30];
 
-void lcs(string x,string y){
-    int m=x.length(), n=y.length();
+void printLCS(string x, int i, int j) {
+    if(i == 0 || j == 0)
+        return;
 
-    for(int i=0;i<=m;i++) c[i][0]=0;
-    for(int j=0;j<=n;j++) c[0][j]=0;
+    if(b[i][j] == 'D') {
+        printLCS(x, i - 1, j - 1);
+        cout << x[i - 1];
+    }
+    else if(b[i][j] == 'U') {
+        printLCS(x, i - 1, j);
+    }
+    else {
+        printLCS(x, i, j - 1);
+    }
+}
 
-    for(int i=1;i<=m;i++){
-        for(int j=1;j<=n;j++){
-            if(x[i-1]==y[j-1]){
-                c[i][j]=c[i-1][j-1]+1;
-                b[i][j]='D';
-            } else if(c[i-1][j]>=c[i][j-1]){
-                c[i][j]=c[i-1][j];
-                b[i][j]='U';
-            } else {
-                c[i][j]=c[i][j-1];
-                b[i][j]='L';
+void lcsLength(string x, string y, int m, int n) {
+    for(int i = 0; i <= m; i++)
+        c[i][0] = 0;
+
+    for(int j = 0; j <= n; j++)
+        c[0][j] = 0;
+
+    for(int i = 1; i <= m; i++) {
+        for(int j = 1; j <= n; j++) {
+            if(x[i - 1] == y[j - 1]) {
+                c[i][j] = c[i - 1][j - 1] + 1;
+                b[i][j] = 'D';
+            }
+            else if(c[i - 1][j] >= c[i][j - 1]) {
+                c[i][j] = c[i - 1][j];
+                b[i][j] = 'U';
+            }
+            else {
+                c[i][j] = c[i][j - 1];
+                b[i][j] = 'L';
             }
         }
-    }
-}`,
 
-kmp: `// KMP
-#include<iostream>
-using namespace std;
+        cout << "\\nB Table:\\n";
+        for(int x1 = 1; x1 <= m; x1++) {
+            for(int y1 = 1; y1 <= n; y1++) {
+                cout << b[x1][y1] << "\\t";
+            }
+            cout << endl;
+        }
 
-void kmp(string T,string P){
-    int n=T.length(), m=P.length();
-    int pi[m+1];
-    pi[1]=0;
-    int k=0;
-
-    for(int q=2;q<=m;q++){
-        while(k>0 && P[k]!=P[q-1])
-            k=pi[k];
-        if(P[k]==P[q-1])
-            k++;
-        pi[q]=k;
-    }
-
-    int q=0;
-    for(int i=1;i<=n;i++){
-        while(q>0 && P[q]!=T[i-1])
-            q=pi[q];
-        if(P[q]==T[i-1])
-            q++;
-        if(q==m){
-            cout<<"Found at "<<i-m<<endl;
-            q=pi[q];
+        cout << "\\nC Table:\\n";
+        for(int x1 = 0; x1 <= m; x1++) {
+            for(int y1 = 0; y1 <= n; y1++) {
+                cout << c[x1][y1] << "\\t";
+            }
+            cout << endl;
         }
     }
+
+    cout << "\\nLength of LCS: " << c[m][n] << endl;
+
+    if(c[m][n] == 0) {
+        cout << "No common subsequence present" << endl;
+    } else {
+        cout << "Longest Common Subsequence: ";
+        printLCS(x, m, n);
+        cout << endl;
+    }
+}
+
+int main() {
+    string x, y;
+
+    cout << "Enter first string: ";
+    cin >> x;
+
+    cout << "Enter second string: ";
+    cin >> y;
+
+    int m = x.length();
+    int n = y.length();
+
+    lcsLength(x, y, m, n);
+
+    return 0;
 }`,
 
-rk: `// Rabin Karp
-#include<iostream>
+kmp: `#include <iostream>
+#include <string>
+using namespace std;
+
+void computePrefixFunction(string p, int pi[]) {
+    int m = p.length();
+    pi[1] = 0;
+    int k = 0;
+
+    for(int q = 2; q <= m; q++) {
+        while(k > 0 && p[k] != p[q - 1])
+            k = pi[k];
+
+        if(p[k] == p[q - 1])
+            k = k + 1;
+
+        pi[q] = k;
+    }
+
+    cout << "PI Table: ";
+    for(int i = 1; i <= m; i++) {
+        cout << pi[i] << " ";
+    }
+    cout << endl;
+}
+
+void kmpMatcher(string T, string P) {
+    int n = T.length();
+    int m = P.length();
+    int pi[100];
+    int flag = 0;
+
+    computePrefixFunction(P, pi);
+
+    int q = 0;
+    for(int i = 1; i <= n; i++) {
+        while(q > 0 && P[q] != T[i - 1])
+            q = pi[q];
+
+        if(P[q] == T[i - 1])
+            q = q + 1;
+
+        if(q == m) {
+            cout << "Pattern occurs at shift: " << i - m << endl;
+            q = pi[q];
+            flag++;
+        }
+    }
+
+    if(flag == 0)
+        cout << "Pattern not found" << endl;
+}
+
+int main() {
+    string T, P;
+
+    cout << "Enter text: ";
+    cin.ignore();
+    getline(cin, T);
+
+    cout << "Enter pattern: ";
+    getline(cin, P);
+
+    kmpMatcher(T, P);
+
+    return 0;
+}`,
+
+rk: `#include <iostream>
+#include <cstring>
 using namespace std;
 
 #define d 256
 
-void search(string txt,string pat,int q){
-    int m=pat.length(), n=txt.length();
-    int p=0,t=0,h=1;
+void search(char pat[], char txt[], int q) {
+    int m = strlen(pat);
+    int n = strlen(txt);
+    int i, j, p = 0, t = 0, h = 1;
+    int flag = 0;
 
-    for(int i=0;i<m-1;i++)
-        h=(h*d)%q;
+    for(i = 0; i < m - 1; i++)
+        h = (h * d) % q;
 
-    for(int i=0;i<m;i++){
-        p=(d*p+pat[i])%q;
-        t=(d*t+txt[i])%q;
+    for(i = 0; i < m; i++) {
+        p = (d * p + pat[i]) % q;
+        t = (d * t + txt[i]) % q;
     }
 
-    for(int i=0;i<=n-m;i++){
-        if(p==t){
-            if(txt.substr(i,m)==pat)
-                cout<<"Found at "<<i<<endl;
+    for(i = 0; i <= n - m; i++) {
+        if(p == t) {
+            for(j = 0; j < m; j++) {
+                if(txt[i + j] != pat[j])
+                    break;
+            }
+
+            if(j == m) {
+                cout << "Pattern occurs at index " << i << endl;
+                flag++;
+            }
         }
-        if(i<n-m){
-            t=(d*(t-txt[i]*h)+txt[i+m])%q;
-            if(t<0) t+=q;
+
+        if(i < n - m) {
+            t = (d * (t - txt[i] * h) + txt[i + m]) % q;
+            if(t < 0)
+                t = t + q;
         }
     }
+
+    if(flag == 0)
+        cout << "Pattern not found" << endl;
+}
+
+int main() {
+    char txt[100], pat[100];
+    int q = 101;
+
+    cout << "Enter text: ";
+    cin >> txt;
+
+    cout << "Enter pattern: ";
+    cin >> pat;
+
+    search(pat, txt, q);
+
+    return 0;
 }`
 };
 
 function copyCode(type) {
     const text = codes[type];
 
-    if (navigator.clipboard) {
+    if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text)
         .then(() => {
             document.getElementById("status").innerText = type.toUpperCase() + " copied!";
